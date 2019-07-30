@@ -22,7 +22,7 @@ class Movie(db.Model):
 
 
 def get_movie_data(movie):
-    url = f'https://api.themoviedb.org/3/search/movie?api_key=API KEY&query={ movie }'
+    url = f'https://api.themoviedb.org/3/search/movie?api_key=INSERTAPIKEY&query={ movie }'
     r = requests.get(url).json()
     return r
 
