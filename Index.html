@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+	<title>Movie Watchlist</title>
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+	<body>
+        <div class = "content">
+            <h1>Add a movie to your watchlist</h1>
+            <div class="container">
+                <div class="columns">
+                        <form method="POST">
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input class="input" name="movie" type="text" placeholder="Movie Name">
+                                    <button class="button is-info">
+                                        Add Movie
+                                    </button>
+                                    <br>
+                                    <br>
+
+                                </div>
+                                    <div>
+                                        {% with messages = get_flashed_messages(with_categories=true) %}
+                                            {% if messages %}
+                                                {% for category, message in messages %}
+                                                    {% set message_class = 'is-success' %}
+                                                    {% if category == 'error' %}
+                                                        {% set message_class = 'is-danger' %}
+                                                    {% endif %}
+                                                    <div class="notification {{ message_class }}">{{ message }}</div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            <div class="container-fluid pt70 pb70">
+                {% for movieData in movie_list  %}
+                <div id="fh5co-projects-feed" class="fh5co-projects-feed clearfix masonry">
+                    <div class="fh5co-project masonry-brick">
+                        <h2 class="title">{{ movieData.title }}</h2>
+                        <a href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ movieData.title }}&s=all">
+                            <img src="https://image.tmdb.org/t/p/w500/{{ movieData.poster_path }}" alt="movie poster">
+                        </a>
+                    </div>
+                            <p>
+                                <br>
+                                <span class="subtitle">Rating: {{ movieData.vote_average }} </span>
+                                <br>
+                                <span class="subtitle">{{ movieData.overview }}</span>
+                                <br>
+                                <span class="subtitle">{{ movieData.release_date }}</span>
+                                <br>
+                            </p>
+                        <div class="control is-expanded">
+                            <a href="{{ url_for('delete_movie', title=movieData.title) }}">
+                            <button class="delete">Delete Movie</button>
+                            </a>
+                            <br>
+                            <br>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<!--END .fh5co-projects-feed-->
+            {% endfor %}
+		<!-- END .container-fluid -->
+
+		<footer id="fh5co-footer" role="contentinfo">
+			<div class="container-fluid">
+				<div class="footer-content">
+				</div>
+			</div>
+		</footer>
+		<!-- END #fh5co-footer -->
+	</body>
+</html>
+
