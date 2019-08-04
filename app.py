@@ -1,15 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-import requests
 from flask_sqlalchemy import SQLAlchemy
+import requests
+import os
+
 
 app = Flask(__name__)
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movie.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = 'thisisasecret'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 db = SQLAlchemy(app)
+
+api_key = os.environ.get('API_KEY')
 
 
 class Movie(db.Model):
@@ -22,33 +26,9 @@ class Movie(db.Model):
 
 
 def get_movie_data(movie):
-    url = f'https://api.themoviedb.org/3/search/movie?api_key=INSERTAPIKEY&query={ movie }'
+    url = f'https://api.themoviedb.org/3/search/movie?api_key={ api_key }&query={ movie }'
     r = requests.get(url).json()
     return r
-
-
-@app.route('/')
-def index_get():
-    movies = Movie.query.all()
-
-    movie_list = []
-
-    for movie in movies:
-
-        r = get_movie_data(movie.title)
-        print(r)
-
-        movieData = {
-            'title': movie.title,
-            'overview': r['results'][0]['overview'],
-            'poster_path': r['results'][0]['poster_path'],
-            'vote_average': r['results'][0]['vote_average'],
-            'release_date': r['results'][0]['release_date'],
-        }
-
-        movie_list.append(movieData)
-
-    return render_template('index.html', movie_list=movie_list)
 
 
 @app.route('/', methods=['POST'])
@@ -80,6 +60,29 @@ def index_post():
     return redirect(url_for('index_get'))
 
 
+@app.route('/')
+def index_get():
+    movies = Movie.query.all()
+
+    movie_list = []
+
+    for movie in movies:
+
+        r = get_movie_data(movie.title)
+
+        movieData = {
+            'title': movie.title,
+            'overview': r['results'][0]['overview'],
+            'poster_path': r['results'][0]['poster_path'],
+            'vote_average': r['results'][0]['vote_average'],
+            'release_date': r['results'][0]['release_date'],
+        }
+
+        movie_list.append(movieData)
+
+    return render_template('index.html', movie_list=movie_list)
+
+
 @app.route('/delete/<title>')
 def delete_movie(title):
     movie = Movie.query.filter_by(title=title).first()
@@ -91,5 +94,6 @@ def delete_movie(title):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
+
 
