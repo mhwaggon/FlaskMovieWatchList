@@ -70,7 +70,7 @@ def index_get():
 
         r = get_movie_data(movie.title)
 
-        movieData = {
+        moviedata = {
             'title': movie.title,
             'overview': r['results'][0]['overview'],
             'poster_path': r['results'][0]['poster_path'],
@@ -78,7 +78,7 @@ def index_get():
             'release_date': r['results'][0]['release_date'],
         }
 
-        movie_list.append(movieData)
+        movie_list.append(moviedata)
 
     return render_template('index.html', movie_list=movie_list)
 

@@ -1,89 +1,82 @@
 
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<title>Movie Watchlist</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Movie Watchlist</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,900' rel='stylesheet' type='text/css'>
-	<link href="https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+  </div>
+</nav>
+  <div align="center">
+      <h1>Watchlist</h1>
+  </div>
+  <br>
+  <br>
+<form method="POST">
+  <div class="form-row">
+    <div class="col-5">
+    </div>
 
-	<body>
-        <div class = "content">
-            <h1>Add a movie to your watchlist</h1>
-            <div class="container">
-                <div class="columns">
-                        <form method="POST">
-                            <div class="field has-addons">
-                                <div class="control is-expanded">
-                                    <input class="input" name="movie" type="text" placeholder="Movie Name">
-                                    <button class="button is-info">
-                                        Add Movie
-                                    </button>
-                                    <br>
-                                    <br>
-
-                                </div>
-                                    <div>
-                                        {% with messages = get_flashed_messages(with_categories=true) %}
-                                            {% if messages %}
-                                                {% for category, message in messages %}
-                                                    {% set message_class = 'is-success' %}
-                                                    {% if category == 'error' %}
-                                                        {% set message_class = 'is-danger' %}
-                                                    {% endif %}
-                                                    <div class="notification {{ message_class }}">{{ message }}</div>
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endwith %}
-                                    </div>
-                                </div>
-                        </form>
-                    </div>
-                </div>
-            <div class="container-fluid pt70 pb70">
-                {% for movieData in movie_list  %}
-                <div id="fh5co-projects-feed" class="fh5co-projects-feed clearfix masonry">
-                    <div class="fh5co-project masonry-brick">
-                        <h2 class="title">{{ movieData.title }}</h2>
-                        <a href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ movieData.title }}&s=all">
-                            <img src="https://image.tmdb.org/t/p/w500/{{ movieData.poster_path }}" alt="movie poster">
-                        </a>
-                    </div>
-                            <p>
-                                <br>
-                                <span class="subtitle">Rating: {{ movieData.vote_average }} </span>
-                                <br>
-                                <span class="subtitle">{{ movieData.overview }}</span>
-                                <br>
-                                <span class="subtitle">{{ movieData.release_date }}</span>
-                                <br>
-                            </p>
-                        <div class="control is-expanded">
-                            <a href="{{ url_for('delete_movie', title=movieData.title) }}">
-                            <button class="delete">Delete Movie</button>
-                            </a>
-                            <br>
-                            <br>
-                            <br>
-                        </div>
-                    </div>
-                </div>
-            </div>
-			<!--END .fh5co-projects-feed-->
+    <div class="col">
+        <input class="input" name="movie" type="text" placeholder="Movie Name">
+            <button class="button is-info">Add Movie</button>
+    </div>
+  </div>
+    <div class="form-row">
+    <div class="col-7">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% set message_class = 'is-success' %}
+                {% if category == 'error' %}
+                    {% set message_class = 'is-danger' %}
+                {% endif %}
+                <div class="notification {{ message_class }}">{{ message }}</div>
             {% endfor %}
-		<!-- END .container-fluid -->
+        {% endif %}
+        {% endwith %}
+    </div>
+  </div>
+</form>
+  <br>
+<div class="list-group" align="center">
+    {% for moviedata in movie_list  %}
+    <h2><a href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ moviedata.title }}&s=all"><h2>{{ moviedata.title }}</h2></a></h2>
+    <ul class="list-group">
+        <a href="https://www.imdb.com/find?ref_=nv_sr_fn&q={{ moviedata.title }}&s=all"><img src="https://image.tmdb.org/t/p/w500/{{ moviedata.poster_path }}" alt="movie poster"><li class="list-group-item list-group-item-light"></a>
+        <br>
+        Rating: {{ moviedata.vote_average }} / 10
+        <br>
+        {{ moviedata.overview }}
+        <br>
+        {{ moviedata.release_date }}
+        <br>
+        <a href="{{ url_for('delete_movie', title=moviedata.title) }}"><button class="delete">Delete Movie</button></a></li>
+    </ul>
+    {% endfor %}
 
-		<footer id="fh5co-footer" role="contentinfo">
-			<div class="container-fluid">
-				<div class="footer-content">
-				</div>
-			</div>
-		</footer>
-		<!-- END #fh5co-footer -->
-	</body>
-</html>
 
+
+
+
+      <li class="list-group-item list-group-item-dark"></li>
+
+
+</ul>
+</div>
