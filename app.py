@@ -16,6 +16,7 @@ db = SQLAlchemy(app)
 api_key = os.environ.get('API_KEY')
 
 
+# Database 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
@@ -24,7 +25,7 @@ class Movie(db.Model):
     vote_average = db.Column(db.Float)
     release_date = db.Column(db.String(50))
 
-
+#Putting togeather API to make request 'r' and return 'r'
 def get_movie_data(movie):
     url = f'https://api.themoviedb.org/3/search/movie?api_key={ api_key }&query={ movie }'
     r = requests.get(url).json()
@@ -34,14 +35,16 @@ def get_movie_data(movie):
 @app.route('/', methods=['POST'])
 def index_post():
     err_msg = ''
-    new_movie = request.form.get('movie') #Data stored after user enters in text box
-
+    #Data stored after user enters in text box on front end
+    new_movie = request.form.get('movie') #
+   
+#Logic to make sure the movie is not already in the watchlist
     if new_movie:
         existing_movie = Movie.query.filter_by(title=new_movie).first()
 
         if not existing_movie:
             new_movie_data = get_movie_data(new_movie)
-
+            #make sure movie that you searched exists/returned results
             if new_movie_data['total_results'] != 0:
                 new_movie_obj = Movie(title=new_movie)
 
@@ -85,6 +88,7 @@ def index_get():
 
 @app.route('/delete/<title>')
 def delete_movie(title):
+    #Delete movie from the database
     movie = Movie.query.filter_by(title=title).first()
     db.session.delete(movie)
     db.session.commit()
