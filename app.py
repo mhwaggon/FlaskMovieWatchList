@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 api_key = os.environ.get('API_KEY')
 
 
-# Database 
+# Creating our database Object
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
@@ -25,26 +25,35 @@ class Movie(db.Model):
     vote_average = db.Column(db.Float)
     release_date = db.Column(db.String(50))
 
-#Putting togeather API to make request 'r' and return 'r'
+
+# Getting our original searched movie through API request
 def get_movie_data(movie):
     url = f'https://api.themoviedb.org/3/search/movie?api_key={ api_key }&query={ movie }'
     r = requests.get(url).json()
     return r
 
 
+# Getting recommended movie suggestions through api request
+def get_recommended_movie(movieid):
+    url = f'https://api.themoviedb.org/3/movie/{ movieid }/recommendations'
+    rec = requests.get(url).json()
+    return rec
+
+
 @app.route('/', methods=['POST'])
 def index_post():
     err_msg = ''
-    #Data stored after user enters in text box on front end
-    new_movie = request.form.get('movie') #
-   
-#Logic to make sure the movie is not already in the watchlist
+    # Data stored in new_movie after user enters in text box on front end
+    new_movie = request.form.get('movie')
+
+    # Logic to make sure the movie doesn't already exist
     if new_movie:
         existing_movie = Movie.query.filter_by(title=new_movie).first()
 
         if not existing_movie:
             new_movie_data = get_movie_data(new_movie)
-            #make sure movie that you searched exists/returned results
+
+            # make sure our api call is returning results
             if new_movie_data['total_results'] != 0:
                 new_movie_obj = Movie(title=new_movie)
 
@@ -69,26 +78,32 @@ def index_get():
 
     movie_list = []
 
+    # iterating through our database movies
     for movie in movies:
 
+        # storing our api requests to r / rec
         r = get_movie_data(movie.title)
 
+        # storing our api call data in a dictionary
         moviedata = {
+            'id': r['results'][0]['id'],
             'title': movie.title,
             'overview': r['results'][0]['overview'],
             'poster_path': r['results'][0]['poster_path'],
             'vote_average': r['results'][0]['vote_average'],
             'release_date': r['results'][0]['release_date'],
+            'recommended_title': rec['results'][0]['title'],
+            'recommended_poster': rec['results'][0]['poster_path']
         }
+        rec = get_recommended_movie(moviedata.id)
 
         movie_list.append(moviedata)
 
-    return render_template('index.html', movie_list=movie_list)
+    return render_template('Index.html', movie_list=movie_list)
 
 
 @app.route('/delete/<title>')
 def delete_movie(title):
-    #Delete movie from the database
     movie = Movie.query.filter_by(title=title).first()
     db.session.delete(movie)
     db.session.commit()
