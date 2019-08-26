@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 api_key = os.environ.get('API_KEY')
 
 
-# Creating our database Object
+# Creating our database model
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
@@ -24,6 +24,7 @@ class Movie(db.Model):
     poster_path = db.Column(db.String(50))
     vote_average = db.Column(db.Float)
     release_date = db.Column(db.String(50))
+    movie_id = db.Column(db.Integer)
 
 
 # Getting our original searched movie through API request
@@ -77,6 +78,7 @@ def index_get():
     movies = Movie.query.all()
 
     movie_list = []
+    rec_list = []
 
     # iterating through our database movies
     for movie in movies:
@@ -86,18 +88,22 @@ def index_get():
 
         # storing our api call data in a dictionary
         moviedata = {
-            'id': r['results'][0]['id'],
+            'movie_id': r['results'][0]['id'],
             'title': movie.title,
             'overview': r['results'][0]['overview'],
             'poster_path': r['results'][0]['poster_path'],
             'vote_average': r['results'][0]['vote_average'],
             'release_date': r['results'][0]['release_date'],
-            'recommended_title': rec['results'][0]['title'],
-            'recommended_poster': rec['results'][0]['poster_path']
         }
-        rec = get_recommended_movie(moviedata.id)
+
+        rec = get_recommended_movie(moviedata['movie_id'])
+        rec_movie_data = {
+            'title': rec['results'][0]['title'],
+            'poster_path': rec['results'][0]['poster_path']
+        }
 
         movie_list.append(moviedata)
+        rec_list.append(rec_movie_data)
 
     return render_template('Index.html', movie_list=movie_list)
 
